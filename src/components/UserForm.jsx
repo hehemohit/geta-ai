@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { X, User, AtSign, Mail, Phone, Globe, Building2, MapPin, Save, UserPlus, AlertCircle } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 import { isValidEmail } from '../utils/helpers';
 import { ButtonSpinner } from './Loader';
 
@@ -89,9 +90,10 @@ const validate = (values) => {
 };
 
 /**
- * UserForm — Animated Cyberpunk Modal with Framer Motion transitions.
+ * UserForm — Dynamic Themed Animated User Modal.
  */
 const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
+  const { activePreset } = useTheme();
   const isEdit = Boolean(user);
   const [form, setForm]       = useState(toForm(user));
   const [errors, setErrors]   = useState({});
@@ -168,7 +170,14 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
         {/* Header */}
         <div className="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md flex items-center justify-between px-6 py-4 border-b border-zinc-850 rounded-t-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-red-950/50 border border-red-600/40 flex items-center justify-center text-red-400 shadow-inner">
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center shadow-inner transition-colors"
+              style={{
+                backgroundColor: `rgba(${activePreset.rgb}, 0.15)`,
+                border: `1px solid ${activePreset.hex}60`,
+                color: activePreset.hex,
+              }}
+            >
               {isEdit ? <User size={18} /> : <UserPlus size={18} />}
             </div>
             <div>
@@ -183,7 +192,7 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-600/60 transition-colors cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors cursor-pointer"
             aria-label="Close dialog"
           >
             <X size={15} />
@@ -194,7 +203,10 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
         <form onSubmit={handleSubmit} noValidate className="px-6 py-5 flex flex-col gap-6 font-sans">
           {FIELDS.map(({ section, fields }) => (
             <div key={section} className="flex flex-col gap-3">
-              <h3 className="font-mono text-[11px] font-bold uppercase tracking-wider text-red-400/90 border-b border-zinc-900 pb-1.5">
+              <h3
+                className="font-mono text-[11px] font-bold uppercase tracking-wider border-b border-zinc-900 pb-1.5 transition-colors"
+                style={{ color: activePreset.hex }}
+              >
                 // {section}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -226,8 +238,17 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
                           className={`w-full pl-9 pr-3 py-2 font-mono text-xs rounded-lg bg-zinc-900/90 text-zinc-100 placeholder-zinc-600 border transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
                             hasError
                               ? 'border-red-600 focus:ring-1 focus:ring-red-600/50'
-                              : 'border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600/50'
+                              : 'border-zinc-850 focus:border-zinc-700'
                           }`}
+                          style={
+                            !hasError
+                              ? {
+                                  ':focus': {
+                                    borderColor: activePreset.hex,
+                                  },
+                                }
+                              : undefined
+                          }
                         />
                       </div>
                       {hasError && (
@@ -256,7 +277,11 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 text-xs font-bold uppercase rounded-lg bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2 text-xs font-bold uppercase rounded-lg text-white transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer shadow-lg"
+              style={{
+                backgroundColor: activePreset.hex,
+                boxShadow: `0 0 14px ${activePreset.glow}`,
+              }}
             >
               {isSubmitting ? (
                 <>

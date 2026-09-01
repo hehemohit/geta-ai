@@ -5,6 +5,7 @@ import {
   ExternalLink, Quote, Terminal, FileText,
   Compass, Radio, Layers, Search,
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 import { fetchUserPosts } from '../services/userApi';
 import { getInitials, ensureProtocol } from '../utils/helpers';
 
@@ -59,9 +60,10 @@ const PostSkeleton = () => (
 );
 
 /**
- * UserDetailModal — Cyberpunk Dossier & Posts Viewer with layout-animated dimensions and smooth morphing.
+ * UserDetailModal — Cyberpunk Dossier & Posts Viewer with dynamic theme synchronization.
  */
 const UserDetailModal = ({ user, onClose }) => {
+  const { activePreset } = useTheme();
   const [posts, setPosts] = useState([]);
   const [postsLoading, setLoading] = useState(true);
   const [postsError, setError] = useState(null);
@@ -142,7 +144,15 @@ const UserDetailModal = ({ user, onClose }) => {
           {/* Avatar & Main Identity */}
           <div className="flex items-center gap-4 min-w-0">
             <div className="relative shrink-0">
-              <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border border-red-500/50 bg-red-950/40 flex items-center justify-center font-mono text-base sm:text-lg font-bold text-red-400 shadow-lg shadow-red-950/50">
+              <div
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center font-mono text-base sm:text-lg font-bold shadow-lg transition-colors"
+                style={{
+                  backgroundColor: `rgba(${activePreset.rgb}, 0.15)`,
+                  borderColor: `${activePreset.hex}60`,
+                  color: activePreset.hex,
+                  boxShadow: `0 0 16px ${activePreset.glow}`,
+                }}
+              >
                 {initials}
               </div>
               <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-zinc-950 shadow-sm" title="Status: Online" />
@@ -156,7 +166,14 @@ const UserDetailModal = ({ user, onClose }) => {
                 >
                   {user.name}
                 </h2>
-                <span className="px-2 py-0.5 rounded font-mono text-[10px] font-semibold text-red-400 bg-red-950/50 border border-red-800/60">
+                <span
+                  className="px-2 py-0.5 rounded font-mono text-[10px] font-semibold transition-colors"
+                  style={{
+                    backgroundColor: `rgba(${activePreset.rgb}, 0.15)`,
+                    border: `1px solid ${activePreset.hex}40`,
+                    color: activePreset.hex,
+                  }}
+                >
                   ID: #{String(user.id).padStart(2, '0')}
                 </span>
               </div>
@@ -170,7 +187,7 @@ const UserDetailModal = ({ user, onClose }) => {
           {/* Close Action */}
           <button
             onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-600/60 hover:bg-red-950/30 transition-all cursor-pointer shrink-0 ml-2"
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-all cursor-pointer shrink-0 ml-2"
             aria-label="Close details modal"
           >
             <X size={17} />
@@ -183,17 +200,25 @@ const UserDetailModal = ({ user, onClose }) => {
           <button
             onClick={() => setActiveTab('dossier')}
             className={`relative flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer ${
-              activeTab === 'dossier' ? 'text-red-400' : 'text-zinc-400 hover:text-zinc-200'
+              activeTab === 'dossier' ? 'text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
             {activeTab === 'dossier' && (
               <motion.div
                 layoutId="active-modal-tab-pill"
-                className="absolute inset-0 bg-red-950/60 border border-red-700/70 rounded-lg shadow-sm shadow-red-950/40"
+                className="absolute inset-0 rounded-lg shadow-sm border"
+                style={{
+                  backgroundColor: `rgba(${activePreset.rgb}, 0.18)`,
+                  borderColor: `${activePreset.hex}80`,
+                  boxShadow: `0 0 12px ${activePreset.glow}`,
+                }}
                 transition={{ type: 'spring', damping: 25, stiffness: 350 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
+            <span
+              className="relative z-10 flex items-center gap-2 transition-colors"
+              style={{ color: activeTab === 'dossier' ? activePreset.hex : undefined }}
+            >
               <FileText size={14} />
               <span>[PROFILE_DOSSIER]</span>
             </span>
@@ -203,17 +228,25 @@ const UserDetailModal = ({ user, onClose }) => {
           <button
             onClick={() => setActiveTab('posts')}
             className={`relative flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer ${
-              activeTab === 'posts' ? 'text-red-400' : 'text-zinc-400 hover:text-zinc-200'
+              activeTab === 'posts' ? 'text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
             {activeTab === 'posts' && (
               <motion.div
                 layoutId="active-modal-tab-pill"
-                className="absolute inset-0 bg-red-950/60 border border-red-700/70 rounded-lg shadow-sm shadow-red-950/40"
+                className="absolute inset-0 rounded-lg shadow-sm border"
+                style={{
+                  backgroundColor: `rgba(${activePreset.rgb}, 0.18)`,
+                  borderColor: `${activePreset.hex}80`,
+                  boxShadow: `0 0 12px ${activePreset.glow}`,
+                }}
                 transition={{ type: 'spring', damping: 25, stiffness: 350 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
+            <span
+              className="relative z-10 flex items-center gap-2 transition-colors"
+              style={{ color: activeTab === 'posts' ? activePreset.hex : undefined }}
+            >
               <Terminal size={14} />
               <span>[LOGGED_POSTS]</span>
               {!postsLoading && (
@@ -241,7 +274,10 @@ const UserDetailModal = ({ user, onClose }) => {
               >
                 {/* Section 1: Communications & Web */}
                 <div className="space-y-3">
-                  <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
+                  <h3
+                    className="font-mono text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors"
+                    style={{ color: activePreset.hex }}
+                  >
                     <Radio size={13} />
                     <span>// COMMUNICATIONS & NETWORK</span>
                   </h3>
@@ -250,12 +286,12 @@ const UserDetailModal = ({ user, onClose }) => {
                     {/* Email */}
                     <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
                       <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <Mail size={12} className="text-red-400" />
+                        <Mail size={12} style={{ color: activePreset.hex }} />
                         Email Address
                       </span>
                       <a
                         href={`mailto:${user.email}`}
-                        className="text-zinc-200 hover:text-red-400 transition-colors font-medium truncate mt-0.5"
+                        className="text-zinc-200 hover:text-white transition-colors font-medium truncate mt-0.5"
                       >
                         {user.email}
                       </a>
@@ -264,7 +300,7 @@ const UserDetailModal = ({ user, onClose }) => {
                     {/* Phone */}
                     <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
                       <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <Phone size={12} className="text-red-400" />
+                        <Phone size={12} style={{ color: activePreset.hex }} />
                         Phone Channel
                       </span>
                       <span className="text-zinc-200 font-medium truncate mt-0.5">
@@ -275,14 +311,15 @@ const UserDetailModal = ({ user, onClose }) => {
                     {/* Website */}
                     <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
                       <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                        <Globe size={12} className="text-red-400" />
+                        <Globe size={12} style={{ color: activePreset.hex }} />
                         Web Portal
                       </span>
                       <a
                         href={ensureProtocol(user.website)}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-red-400 hover:text-red-300 transition-colors font-medium truncate flex items-center gap-1 mt-0.5"
+                        className="transition-colors font-medium truncate flex items-center gap-1 mt-0.5 hover:underline"
+                        style={{ color: activePreset.hex }}
                       >
                         <span className="truncate">{user.website}</span>
                         <ExternalLink size={11} className="shrink-0 opacity-80" />
@@ -293,7 +330,10 @@ const UserDetailModal = ({ user, onClose }) => {
 
                 {/* Section 2: Corporate & Business Operations */}
                 <div className="space-y-3">
-                  <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
+                  <h3
+                    className="font-mono text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors"
+                    style={{ color: activePreset.hex }}
+                  >
                     <Building2 size={13} />
                     <span>// CORPORATE AFFILIATION</span>
                   </h3>
@@ -317,7 +357,7 @@ const UserDetailModal = ({ user, onClose }) => {
 
                     {user.company?.catchPhrase && (
                       <div className="flex items-start gap-2.5 pt-1">
-                        <Quote size={16} className="text-red-500/80 shrink-0 mt-0.5" />
+                        <Quote size={16} className="shrink-0 mt-0.5" style={{ color: activePreset.hex }} />
                         <p className="italic text-xs sm:text-sm text-zinc-300 leading-relaxed font-sans">
                           "{user.company.catchPhrase}"
                         </p>
@@ -328,7 +368,10 @@ const UserDetailModal = ({ user, onClose }) => {
 
                 {/* Section 3: Physical Address & Geolocation Coordinates */}
                 <div className="space-y-3">
-                  <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
+                  <h3
+                    className="font-mono text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-colors"
+                    style={{ color: activePreset.hex }}
+                  >
                     <Compass size={13} />
                     <span>// GEOGRAPHIC COORDINATES & ADDRESS</span>
                   </h3>
@@ -336,7 +379,7 @@ const UserDetailModal = ({ user, onClose }) => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
                     {/* Street & Suite */}
                     <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex items-start gap-3">
-                      <MapPin size={16} className="text-red-400 shrink-0 mt-0.5" />
+                      <MapPin size={16} className="shrink-0 mt-0.5" style={{ color: activePreset.hex }} />
                       <div>
                         <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">
                           STREET ADDRESS
@@ -352,7 +395,7 @@ const UserDetailModal = ({ user, onClose }) => {
 
                     {/* Lat / Lng Coordinates */}
                     <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex items-start gap-3">
-                      <Compass size={16} className="text-red-400 shrink-0 mt-0.5" />
+                      <Compass size={16} className="shrink-0 mt-0.5" style={{ color: activePreset.hex }} />
                       <div>
                         <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">
                           SATELLITE POSITION (LAT / LNG)
@@ -384,7 +427,7 @@ const UserDetailModal = ({ user, onClose }) => {
                 {/* Search Within Posts Header */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 font-mono">
                   <div className="flex items-center gap-2">
-                    <Layers size={14} className="text-red-400" />
+                    <Layers size={14} style={{ color: activePreset.hex }} />
                     <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">
                       TRANSMITTED DISPATCHES ({posts.length})
                     </span>
@@ -401,7 +444,10 @@ const UserDetailModal = ({ user, onClose }) => {
                         value={postSearch}
                         onChange={(e) => setPostSearch(e.target.value)}
                         placeholder="Filter user posts..."
-                        className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-red-600 transition-all font-mono"
+                        className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:outline-none transition-all font-mono"
+                        style={{
+                          borderColor: postSearch ? activePreset.hex : undefined,
+                        }}
                       />
                     </div>
                   )}
@@ -436,10 +482,20 @@ const UserDetailModal = ({ user, onClose }) => {
                     {filteredPosts.map((post, idx) => (
                       <article
                         key={post.id}
-                        className="p-4 sm:p-5 rounded-xl bg-zinc-950/80 border border-zinc-850 hover:border-red-900/60 transition-all duration-150 space-y-2 group"
+                        className="p-4 sm:p-5 rounded-xl bg-zinc-950/80 border border-zinc-850 transition-all duration-150 space-y-2 group hover:border-zinc-700"
+                        style={{
+                          '--post-accent': activePreset.hex,
+                        }}
                       >
                         <div className="flex items-center justify-between gap-2 font-mono text-[10px]">
-                          <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-red-400 font-bold">
+                          <span
+                            className="px-2 py-0.5 rounded font-bold transition-colors"
+                            style={{
+                              backgroundColor: `rgba(${activePreset.rgb}, 0.15)`,
+                              border: `1px solid ${activePreset.hex}50`,
+                              color: activePreset.hex,
+                            }}
+                          >
                             DISPATCH #{String(idx + 1).padStart(2, '0')}
                           </span>
                           <span className="text-zinc-500 font-mono">
@@ -447,7 +503,7 @@ const UserDetailModal = ({ user, onClose }) => {
                           </span>
                         </div>
 
-                        <h4 className="font-bold text-sm text-zinc-100 group-hover:text-red-400 transition-colors capitalize font-sans leading-snug">
+                        <h4 className="font-bold text-sm text-zinc-100 transition-colors capitalize font-sans leading-snug">
                           {post.title}
                         </h4>
 
@@ -471,7 +527,7 @@ const UserDetailModal = ({ user, onClose }) => {
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors ml-auto cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-850 text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors ml-auto cursor-pointer"
           >
             [DISMISS]
           </button>

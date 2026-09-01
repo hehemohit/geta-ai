@@ -1,8 +1,9 @@
 import React, { memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 /**
- * Pagination — Cyberpunk Red Style Client-Side Pagination.
+ * Pagination — Dynamic Cyberpunk Theme Client-Side Pagination.
  */
 const Pagination = memo(({
   currentPage,
@@ -11,6 +12,8 @@ const Pagination = memo(({
   itemsPerPage,
   onPageChange,
 }) => {
+  const { activePreset } = useTheme();
+
   if (totalPages <= 1) return null;
 
   const startItem = (currentPage - 1) * itemsPerPage + 1;
@@ -30,7 +33,10 @@ const Pagination = memo(({
       <div className="text-xs text-zinc-500">
         Showing <span className="text-zinc-300 font-medium">{startItem}</span> to{' '}
         <span className="text-zinc-300 font-medium">{endItem}</span> of{' '}
-        <span className="text-red-400 font-semibold">{totalItems}</span> users
+        <span className="font-semibold transition-colors" style={{ color: activePreset.hex }}>
+          {totalItems}
+        </span>{' '}
+        users
       </div>
 
       {/* Navigation Buttons */}
@@ -40,7 +46,7 @@ const Pagination = memo(({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           aria-label="Go to previous page"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 bg-zinc-950 border border-zinc-800 hover:border-red-600/60 hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 bg-zinc-950 border border-zinc-800 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
         >
           <ChevronLeft size={13} />
           <span>Prev</span>
@@ -58,9 +64,18 @@ const Pagination = memo(({
                 aria-label={`Go to page ${page}`}
                 className={`min-w-[30px] h-7.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/40 border border-red-500 scale-105'
+                    ? 'text-white shadow-lg scale-105 border'
                     : 'text-zinc-400 bg-zinc-950 border border-zinc-800 hover:border-zinc-700 hover:text-zinc-200'
                 }`}
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: activePreset.hex,
+                        borderColor: activePreset.hex,
+                        boxShadow: `0 0 12px ${activePreset.glow}`,
+                      }
+                    : undefined
+                }
               >
                 {page}
               </button>
@@ -73,7 +88,7 @@ const Pagination = memo(({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           aria-label="Go to next page"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 bg-zinc-950 border border-zinc-800 hover:border-red-600/60 hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 bg-zinc-950 border border-zinc-800 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
         >
           <span>Next</span>
           <ChevronRight size={13} />
