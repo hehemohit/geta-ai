@@ -30,6 +30,22 @@ const modalVariants = {
   },
 };
 
+const tabContentVariants = {
+  hidden: { opacity: 0, y: 10, filter: 'blur(2px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.22, ease: [0.25, 1, 0.5, 1] },
+  },
+  exit: {
+    opacity: 0,
+    y: -8,
+    filter: 'blur(2px)',
+    transition: { duration: 0.14, ease: 'easeIn' },
+  },
+};
+
 /* ── Post Skeleton Loader ────────────────────────────────────────── */
 const PostSkeleton = () => (
   <div className="p-4 bg-zinc-900/40 rounded-xl border border-zinc-850 animate-pulse space-y-2.5">
@@ -43,7 +59,7 @@ const PostSkeleton = () => (
 );
 
 /**
- * UserDetailModal — Enhanced Cyberpunk Dossier & Dispatches Viewer.
+ * UserDetailModal — Cyberpunk Dossier & Posts Viewer with layout-animated dimensions and smooth morphing.
  */
 const UserDetailModal = ({ user, onClose }) => {
   const [posts, setPosts] = useState([]);
@@ -110,8 +126,10 @@ const UserDetailModal = ({ user, onClose }) => {
         onClick={onClose}
       />
 
-      {/* Main Modal Dialog */}
+      {/* Main Modal Dialog with Layout Animation */}
       <motion.div
+        layout
+        transition={{ duration: 0.28, ease: [0.25, 1, 0.5, 1] }}
         className="relative z-10 bg-[#09090b] border border-zinc-800 rounded-2xl sm:rounded-3xl w-full max-w-3xl lg:max-w-4xl max-h-[90vh] flex flex-col shadow-2xl shadow-black overflow-hidden"
         variants={modalVariants}
         initial="hidden"
@@ -159,274 +177,294 @@ const UserDetailModal = ({ user, onClose }) => {
           </button>
         </div>
 
-        {/* ── Segmented Navigation Tabs ────────────────────────────── */}
-        <div className="flex items-center gap-2 px-5 sm:px-8 pt-4 pb-1 border-b border-zinc-900 bg-zinc-950/50 shrink-0 font-mono text-xs">
+        {/* ── Segmented Navigation Tabs with Sliding Pill ───────────── */}
+        <div className="flex items-center gap-2 px-5 sm:px-8 pt-4 pb-2 border-b border-zinc-900 bg-zinc-950/50 shrink-0 font-mono text-xs">
+          {/* Tab 1: Profile Dossier */}
           <button
             onClick={() => setActiveTab('dossier')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
-              activeTab === 'dossier'
-                ? 'bg-red-950/50 text-red-400 border border-red-700/60 shadow-sm'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+            className={`relative flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer ${
+              activeTab === 'dossier' ? 'text-red-400' : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <FileText size={14} />
-            <span>[PROFILE_DOSSIER]</span>
+            {activeTab === 'dossier' && (
+              <motion.div
+                layoutId="active-modal-tab-pill"
+                className="absolute inset-0 bg-red-950/60 border border-red-700/70 rounded-lg shadow-sm shadow-red-950/40"
+                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              <FileText size={14} />
+              <span>[PROFILE_DOSSIER]</span>
+            </span>
           </button>
 
+          {/* Tab 2: Logged Posts */}
           <button
             onClick={() => setActiveTab('posts')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
-              activeTab === 'posts'
-                ? 'bg-red-950/50 text-red-400 border border-red-700/60 shadow-sm'
-                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+            className={`relative flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer ${
+              activeTab === 'posts' ? 'text-red-400' : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <Terminal size={14} />
-            <span>[LOGGED_POSTS]</span>
-            {!postsLoading && (
-              <span className="ml-1 px-1.5 py-0.2 rounded bg-zinc-800 text-[10px] text-zinc-300">
-                {posts.length}
-              </span>
+            {activeTab === 'posts' && (
+              <motion.div
+                layoutId="active-modal-tab-pill"
+                className="absolute inset-0 bg-red-950/60 border border-red-700/70 rounded-lg shadow-sm shadow-red-950/40"
+                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              />
             )}
+            <span className="relative z-10 flex items-center gap-2">
+              <Terminal size={14} />
+              <span>[LOGGED_POSTS]</span>
+              {!postsLoading && (
+                <span className="ml-1 px-1.5 py-0.2 rounded bg-zinc-800 text-[10px] text-zinc-300">
+                  {posts.length}
+                </span>
+              )}
+            </span>
           </button>
         </div>
 
-        {/* ── Scrollable Tab Content ────────────────────────────────── */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-6">
-          
-          {/* TAB 1: Profile Dossier */}
-          {activeTab === 'dossier' && (
-            <motion.div
-              key="dossier-tab"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.15 }}
-              className="space-y-6"
-            >
-              {/* Section 1: Communications & Web */}
-              <div className="space-y-3">
-                <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
-                  <Radio size={13} />
-                  <span>// COMMUNICATIONS & NETWORK</span>
-                </h3>
+        {/* ── Stable Animated Content Viewport ─────────────────────── */}
+        <div className="flex-1 min-h-[440px] max-h-[58vh] overflow-y-auto p-5 sm:p-8">
+          <AnimatePresence mode="wait">
+            
+            {/* TAB 1: Profile Dossier */}
+            {activeTab === 'dossier' && (
+              <motion.div
+                key="dossier-tab"
+                variants={tabContentVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="space-y-6"
+              >
+                {/* Section 1: Communications & Web */}
+                <div className="space-y-3">
+                  <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
+                    <Radio size={13} />
+                    <span>// COMMUNICATIONS & NETWORK</span>
+                  </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
-                  {/* Email */}
-                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
-                    <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                      <Mail size={12} className="text-red-400" />
-                      Email Address
-                    </span>
-                    <a
-                      href={`mailto:${user.email}`}
-                      className="text-zinc-200 hover:text-red-400 transition-colors font-medium truncate mt-0.5"
-                    >
-                      {user.email}
-                    </a>
-                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
+                    {/* Email */}
+                    <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
+                      <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                        <Mail size={12} className="text-red-400" />
+                        Email Address
+                      </span>
+                      <a
+                        href={`mailto:${user.email}`}
+                        className="text-zinc-200 hover:text-red-400 transition-colors font-medium truncate mt-0.5"
+                      >
+                        {user.email}
+                      </a>
+                    </div>
 
-                  {/* Phone */}
-                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
-                    <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                      <Phone size={12} className="text-red-400" />
-                      Phone Channel
-                    </span>
-                    <span className="text-zinc-200 font-medium truncate mt-0.5">
-                      {user.phone}
-                    </span>
-                  </div>
+                    {/* Phone */}
+                    <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
+                      <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                        <Phone size={12} className="text-red-400" />
+                        Phone Channel
+                      </span>
+                      <span className="text-zinc-200 font-medium truncate mt-0.5">
+                        {user.phone}
+                      </span>
+                    </div>
 
-                  {/* Website */}
-                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
-                    <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                      <Globe size={12} className="text-red-400" />
-                      Web Portal
-                    </span>
-                    <a
-                      href={ensureProtocol(user.website)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-red-400 hover:text-red-300 transition-colors font-medium truncate flex items-center gap-1 mt-0.5"
-                    >
-                      <span className="truncate">{user.website}</span>
-                      <ExternalLink size={11} className="shrink-0 opacity-80" />
-                    </a>
+                    {/* Website */}
+                    <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex flex-col justify-between gap-1">
+                      <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                        <Globe size={12} className="text-red-400" />
+                        Web Portal
+                      </span>
+                      <a
+                        href={ensureProtocol(user.website)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-red-400 hover:text-red-300 transition-colors font-medium truncate flex items-center gap-1 mt-0.5"
+                      >
+                        <span className="truncate">{user.website}</span>
+                        <ExternalLink size={11} className="shrink-0 opacity-80" />
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Section 2: Corporate & Business Operations */}
-              <div className="space-y-3">
-                <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
-                  <Building2 size={13} />
-                  <span>// CORPORATE AFFILIATION</span>
-                </h3>
+                {/* Section 2: Corporate & Business Operations */}
+                <div className="space-y-3">
+                  <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
+                    <Building2 size={13} />
+                    <span>// CORPORATE AFFILIATION</span>
+                  </h3>
 
-                <div className="p-4 sm:p-5 rounded-xl bg-zinc-950/80 border border-zinc-850 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
-                    <div>
-                      <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest block">
-                        ENTERPRISE NAME
-                      </span>
-                      <p className="text-base font-bold text-zinc-100">
-                        {user.company?.name || 'Independent Consultant'}
-                      </p>
+                  <div className="p-4 sm:p-5 rounded-xl bg-zinc-950/80 border border-zinc-850 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
+                      <div>
+                        <span className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest block">
+                          ENTERPRISE NAME
+                        </span>
+                        <p className="text-base font-bold text-zinc-100">
+                          {user.company?.name || 'Independent Consultant'}
+                        </p>
+                      </div>
+                      {user.company?.bs && (
+                        <span className="self-start sm:self-center px-2.5 py-1 rounded font-mono text-[10px] font-semibold text-zinc-400 bg-zinc-900 border border-zinc-800">
+                          TAG: {user.company.bs}
+                        </span>
+                      )}
                     </div>
-                    {user.company?.bs && (
-                      <span className="self-start sm:self-center px-2.5 py-1 rounded font-mono text-[10px] font-semibold text-zinc-400 bg-zinc-900 border border-zinc-800">
-                        TAG: {user.company.bs}
-                      </span>
+
+                    {user.company?.catchPhrase && (
+                      <div className="flex items-start gap-2.5 pt-1">
+                        <Quote size={16} className="text-red-500/80 shrink-0 mt-0.5" />
+                        <p className="italic text-xs sm:text-sm text-zinc-300 leading-relaxed font-sans">
+                          "{user.company.catchPhrase}"
+                        </p>
+                      </div>
                     )}
                   </div>
+                </div>
 
-                  {user.company?.catchPhrase && (
-                    <div className="flex items-start gap-2.5 pt-1">
-                      <Quote size={16} className="text-red-500/80 shrink-0 mt-0.5" />
-                      <p className="italic text-xs sm:text-sm text-zinc-300 leading-relaxed font-sans">
-                        "{user.company.catchPhrase}"
-                      </p>
+                {/* Section 3: Physical Address & Geolocation Coordinates */}
+                <div className="space-y-3">
+                  <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
+                    <Compass size={13} />
+                    <span>// GEOGRAPHIC COORDINATES & ADDRESS</span>
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                    {/* Street & Suite */}
+                    <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex items-start gap-3">
+                      <MapPin size={16} className="text-red-400 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">
+                          STREET ADDRESS
+                        </span>
+                        <p className="text-zinc-200 font-medium mt-0.5">
+                          {user.address?.street || 'N/A'}{user.address?.suite ? `, ${user.address.suite}` : ''}
+                        </p>
+                        <p className="text-zinc-400 text-[11px] mt-0.5">
+                          {user.address?.city || 'Unknown City'}, {user.address?.zipcode || ''}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Lat / Lng Coordinates */}
+                    <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex items-start gap-3">
+                      <Compass size={16} className="text-red-400 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">
+                          SATELLITE POSITION (LAT / LNG)
+                        </span>
+                        <p className="text-zinc-200 font-bold mt-0.5">
+                          {user.address?.geo?.lat ? `${user.address.geo.lat}°, ${user.address.geo.lng}°` : 'COORDS_UNAVAILABLE'}
+                        </p>
+                        <p className="text-[10px] text-emerald-400/80 mt-0.5">
+                          [GPS_STATUS: LOCKED]
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </motion.div>
+            )}
+
+            {/* TAB 2: Logged Posts Feed */}
+            {activeTab === 'posts' && (
+              <motion.div
+                key="posts-tab"
+                variants={tabContentVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="space-y-4"
+              >
+                {/* Search Within Posts Header */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 font-mono">
+                  <div className="flex items-center gap-2">
+                    <Layers size={14} className="text-red-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">
+                      TRANSMITTED DISPATCHES ({posts.length})
+                    </span>
+                  </div>
+
+                  {posts.length > 0 && (
+                    <div className="relative sm:w-64">
+                      <Search
+                        size={13}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
+                      />
+                      <input
+                        type="text"
+                        value={postSearch}
+                        onChange={(e) => setPostSearch(e.target.value)}
+                        placeholder="Filter user posts..."
+                        className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-red-600 transition-all font-mono"
+                      />
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* Section 3: Physical Address & Geolocation Coordinates */}
-              <div className="space-y-3">
-                <h3 className="font-mono text-xs font-bold text-red-400/90 uppercase tracking-widest flex items-center gap-2">
-                  <Compass size={13} />
-                  <span>// GEOGRAPHIC COORDINATES & ADDRESS</span>
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
-                  {/* Street & Suite */}
-                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex items-start gap-3">
-                    <MapPin size={16} className="text-red-400 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">
-                        STREET ADDRESS
-                      </span>
-                      <p className="text-zinc-200 font-medium mt-0.5">
-                        {user.address?.street || 'N/A'}{user.address?.suite ? `, ${user.address.suite}` : ''}
-                      </p>
-                      <p className="text-zinc-400 text-[11px] mt-0.5">
-                        {user.address?.city || 'Unknown City'}, {user.address?.zipcode || ''}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Lat / Lng Coordinates */}
-                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-850 flex items-start gap-3">
-                    <Compass size={16} className="text-red-400 shrink-0 mt-0.5" />
-                    <div>
-                      <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider block">
-                        SATELLITE POSITION (LAT / LNG)
-                      </span>
-                      <p className="text-zinc-200 font-bold mt-0.5">
-                        {user.address?.geo?.lat ? `${user.address.geo.lat}°, ${user.address.geo.lng}°` : 'COORDS_UNAVAILABLE'}
-                      </p>
-                      <p className="text-[10px] text-emerald-400/80 mt-0.5">
-                        [GPS_STATUS: LOCKED]
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </motion.div>
-          )}
-
-          {/* TAB 2: Logged Posts Feed */}
-          {activeTab === 'posts' && (
-            <motion.div
-              key="posts-tab"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.15 }}
-              className="space-y-4"
-            >
-              {/* Search Within Posts Header */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 font-mono">
-                <div className="flex items-center gap-2">
-                  <Layers size={14} className="text-red-400" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">
-                    TRANSMITTED DISPATCHES ({posts.length})
-                  </span>
-                </div>
-
-                {posts.length > 0 && (
-                  <div className="relative sm:w-64">
-                    <Search
-                      size={13}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
-                    />
-                    <input
-                      type="text"
-                      value={postSearch}
-                      onChange={(e) => setPostSearch(e.target.value)}
-                      placeholder="Filter user posts..."
-                      className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-red-600 transition-all font-mono"
-                    />
+                {/* Loading State */}
+                {postsLoading && (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <PostSkeleton key={i} />
+                    ))}
                   </div>
                 )}
-              </div>
 
-              {/* Loading State */}
-              {postsLoading && (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <PostSkeleton key={i} />
-                  ))}
-                </div>
-              )}
+                {/* Error State */}
+                {postsError && (
+                  <div className="p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-300 font-mono text-xs">
+                    [!] ERROR_RETRIEVING_DATA: {postsError}
+                  </div>
+                )}
 
-              {/* Error State */}
-              {postsError && (
-                <div className="p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-300 font-mono text-xs">
-                  [!] ERROR_RETRIEVING_DATA: {postsError}
-                </div>
-              )}
+                {/* Empty Posts State */}
+                {!postsLoading && !postsError && filteredPosts.length === 0 && (
+                  <div className="p-8 text-center rounded-xl bg-zinc-950/60 border border-zinc-850 font-mono text-xs text-zinc-500">
+                    {postSearch ? 'No posts matching query filter.' : '[NO_TRANSMISSIONS_RECORDED]'}
+                  </div>
+                )}
 
-              {/* Empty Posts State */}
-              {!postsLoading && !postsError && filteredPosts.length === 0 && (
-                <div className="p-8 text-center rounded-xl bg-zinc-950/60 border border-zinc-850 font-mono text-xs text-zinc-500">
-                  {postSearch ? 'No posts matching query filter.' : '[NO_TRANSMISSIONS_RECORDED]'}
-                </div>
-              )}
+                {/* Posts Feed */}
+                {!postsLoading && !postsError && filteredPosts.length > 0 && (
+                  <div className="space-y-3 pr-1">
+                    {filteredPosts.map((post, idx) => (
+                      <article
+                        key={post.id}
+                        className="p-4 sm:p-5 rounded-xl bg-zinc-950/80 border border-zinc-850 hover:border-red-900/60 transition-all duration-150 space-y-2 group"
+                      >
+                        <div className="flex items-center justify-between gap-2 font-mono text-[10px]">
+                          <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-red-400 font-bold">
+                            DISPATCH #{String(idx + 1).padStart(2, '0')}
+                          </span>
+                          <span className="text-zinc-500 font-mono">
+                            POST_ID: {post.id}
+                          </span>
+                        </div>
 
-              {/* Posts Feed */}
-              {!postsLoading && !postsError && filteredPosts.length > 0 && (
-                <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-                  {filteredPosts.map((post, idx) => (
-                    <article
-                      key={post.id}
-                      className="p-4 sm:p-5 rounded-xl bg-zinc-950/80 border border-zinc-850 hover:border-red-900/60 transition-all duration-150 space-y-2 group"
-                    >
-                      <div className="flex items-center justify-between gap-2 font-mono text-[10px]">
-                        <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-red-400 font-bold">
-                          DISPATCH #{String(idx + 1).padStart(2, '0')}
-                        </span>
-                        <span className="text-zinc-500 font-mono">
-                          POST_ID: {post.id}
-                        </span>
-                      </div>
+                        <h4 className="font-bold text-sm text-zinc-100 group-hover:text-red-400 transition-colors capitalize font-sans leading-snug">
+                          {post.title}
+                        </h4>
 
-                      <h4 className="font-bold text-sm text-zinc-100 group-hover:text-red-400 transition-colors capitalize font-sans leading-snug">
-                        {post.title}
-                      </h4>
+                        <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+                          {post.body}
+                        </p>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
 
-                      <p className="text-xs text-zinc-400 leading-relaxed font-sans">
-                        {post.body}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          )}
-
+          </AnimatePresence>
         </div>
 
-        {/* ── Bottom Modal Footer ──────────────────────────────────── */}
+        {/* ── Bottom Modal Footer with Layout Smoothing ────────────── */}
         <div className="bg-zinc-950/95 border-t border-zinc-900 px-5 sm:px-8 py-3.5 flex items-center justify-between font-mono text-xs shrink-0">
           <span className="text-[11px] text-zinc-500 hidden sm:inline">
             // NODE_RECORD_SYNCED • JSONPLACEHOLDER_API

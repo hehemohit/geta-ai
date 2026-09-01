@@ -42,7 +42,7 @@ const emptyVariants = {
 };
 
 /**
- * UserList — Animated 3-column cyberpunk grid with staggered entry and smooth layout transitions.
+ * UserList — Animated 3-column cyberpunk grid with hover scale/lift animations.
  */
 const UserList = memo(({
   users,
@@ -98,8 +98,13 @@ const UserList = memo(({
               key={user.id}
               variants={cardVariants}
               layout
-              whileHover={{ y: -3, transition: { duration: 0.15 } }}
-              className="h-full"
+              whileHover={{
+                scale: 1.03,
+                y: -4,
+                transition: { duration: 0.2, ease: 'easeOut' },
+              }}
+              whileTap={{ scale: 0.98 }}
+              className="h-full relative z-0 hover:z-10"
             >
               <UserCard
                 user={user}
