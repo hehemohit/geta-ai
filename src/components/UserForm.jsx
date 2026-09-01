@@ -1,12 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, AtSign, Mail, Phone, Globe, Building2, MapPin, Save, UserPlus, AlertCircle } from 'lucide-react';
 import { isValidEmail } from '../utils/helpers';
 import { ButtonSpinner } from './Loader';
 
+/* ── Animation Variants ────────────────────────────────────────── */
+const backdropVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.2 } },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
+};
+
+const modalVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 16 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: 'spring', damping: 26, stiffness: 360 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.96,
+    y: 10,
+    transition: { duration: 0.15 },
+  },
+};
+
 /* ── Field config ──────────────────────────────────────────────── */
 const FIELDS = [
   {
-    section: 'Personal Information',
+    section: 'Personal Identity',
     fields: [
       { id: 'name',     label: 'Full Name',   icon: User,      type: 'text',  required: true  },
       { id: 'username', label: 'Username',     icon: AtSign,    type: 'text',  required: true  },
@@ -15,14 +39,14 @@ const FIELDS = [
     ],
   },
   {
-    section: 'Company & Web',
+    section: 'Organization & Network',
     fields: [
       { id: 'companyName', label: 'Company Name', icon: Building2, type: 'text', required: true  },
       { id: 'website',     label: 'Website',      icon: Globe,     type: 'text', required: false },
     ],
   },
   {
-    section: 'Address',
+    section: 'Location',
     fields: [
       { id: 'street', label: 'Street', icon: MapPin, type: 'text', required: false },
       { id: 'city',   label: 'City',   icon: MapPin, type: 'text', required: false },
@@ -65,7 +89,7 @@ const validate = (values) => {
 };
 
 /**
- * UserForm — accessible modal with keyboard escape handling and validation.
+ * UserForm — Animated Cyberpunk Modal with Framer Motion transitions.
  */
 const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
   const isEdit = Boolean(user);
@@ -79,7 +103,7 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
     setTouched({});
   }, [user]);
 
-  // Escape key listener for modal accessibility
+  // Escape key listener
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && !isSubmitting) {
@@ -117,62 +141,76 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
-      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="form-modal-title"
     >
-      <div
-        className="bg-gray-900 border border-gray-800 relative rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl"
+      {/* Backdrop */}
+      <motion.div
+        className="fixed inset-0 bg-black/80 backdrop-blur-md"
+        variants={backdropVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        onClick={onClose}
+      />
+
+      {/* Modal Dialog */}
+      <motion.div
+        className="relative z-10 bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/90 font-mono"
+        variants={modalVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-md flex items-center justify-between px-6 py-4 border-b border-gray-800 rounded-t-3xl">
+        <div className="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md flex items-center justify-between px-6 py-4 border-b border-zinc-850 rounded-t-2xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md">
+            <div className="w-10 h-10 rounded-lg bg-red-950/50 border border-red-600/40 flex items-center justify-center text-red-400 shadow-inner">
               {isEdit ? <User size={18} /> : <UserPlus size={18} />}
             </div>
             <div>
-              <h2 id="form-modal-title" className="text-base font-bold text-gray-100">
-                {isEdit ? `Edit ${user.name}` : 'Add New User'}
+              <h2 id="form-modal-title" className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wide">
+                {isEdit ? `[EDIT_USER] ${user.name}` : '[REGISTER_NEW_USER]'}
               </h2>
-              <p className="text-xs text-gray-400">
-                {isEdit ? 'Update user profile and contact details' : 'Fill in the fields below to register a new user'}
+              <p className="text-[11px] text-zinc-500 font-sans">
+                {isEdit ? 'Modify active profile database entry' : 'Input identity parameters to deploy record'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-600/60 transition-colors cursor-pointer"
             aria-label="Close dialog"
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} noValidate className="px-6 py-5 flex flex-col gap-6">
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} noValidate className="px-6 py-5 flex flex-col gap-6 font-sans">
           {FIELDS.map(({ section, fields }) => (
-            <div key={section} className="flex flex-col gap-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-800 pb-2">
-                {section}
+            <div key={section} className="flex flex-col gap-3">
+              <h3 className="font-mono text-[11px] font-bold uppercase tracking-wider text-red-400/90 border-b border-zinc-900 pb-1.5">
+                // {section}
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {fields.map(({ id, label, icon: Icon, type, required }) => {
                   const hasError = errors[id] && touched[id];
                   return (
-                    <div key={id} className="flex flex-col gap-1.5">
-                      <label htmlFor={id} className="text-xs font-medium text-gray-300 flex items-center gap-1">
+                    <div key={id} className="flex flex-col gap-1">
+                      <label htmlFor={id} className="font-mono text-[11px] text-zinc-400 flex items-center gap-1">
                         {label}
-                        {required && <span className="text-rose-400">*</span>}
+                        {required && <span className="text-red-400">*</span>}
                       </label>
                       <div className="relative">
                         <Icon
-                          size={15}
-                          className={`absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none ${
-                            hasError ? 'text-rose-400' : 'text-gray-400'
+                          size={14}
+                          className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${
+                            hasError ? 'text-red-400' : 'text-zinc-500'
                           }`}
                           aria-hidden="true"
                         />
@@ -185,16 +223,16 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
                           onBlur={handleBlur}
                           disabled={isSubmitting}
                           placeholder={`Enter ${label.toLowerCase()}...`}
-                          className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-gray-950 text-gray-100 placeholder-gray-600 border transition-all focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          className={`w-full pl-9 pr-3 py-2 font-mono text-xs rounded-lg bg-zinc-900/90 text-zinc-100 placeholder-zinc-600 border transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
                             hasError
-                              ? 'border-rose-500/80 focus:border-rose-500 focus:ring-rose-500/20'
-                              : 'border-gray-700/80 focus:border-indigo-500 focus:ring-indigo-500/20'
+                              ? 'border-red-600 focus:ring-1 focus:ring-red-600/50'
+                              : 'border-zinc-800 focus:border-red-600 focus:ring-1 focus:ring-red-600/50'
                           }`}
                         />
                       </div>
                       {hasError && (
-                        <p className="flex items-center gap-1 text-[11px] text-rose-400 mt-0.5">
-                          <AlertCircle size={12} className="shrink-0" />
+                        <p className="flex items-center gap-1 font-mono text-[10px] text-red-400 mt-0.5">
+                          <AlertCircle size={11} className="shrink-0" />
                           <span>{errors[id]}</span>
                         </p>
                       )}
@@ -206,40 +244,40 @@ const UserForm = ({ user, onSubmit, onClose, isSubmitting }) => {
           ))}
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-900 font-mono">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-5 py-2.5 text-sm font-medium rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-xs font-semibold rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              Cancel
+              [CANCEL]
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-5 py-2 text-xs font-bold uppercase rounded-lg bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSubmitting ? (
                 <>
                   <ButtonSpinner />
-                  <span>Saving...</span>
+                  <span>COMMITTING...</span>
                 </>
               ) : isEdit ? (
                 <>
-                  <Save size={15} />
-                  <span>Save Changes</span>
+                  <Save size={14} />
+                  <span>[SAVE_CHANGES]</span>
                 </>
               ) : (
                 <>
-                  <UserPlus size={15} />
-                  <span>Create User</span>
+                  <UserPlus size={14} />
+                  <span>[CREATE_RECORD]</span>
                 </>
               )}
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

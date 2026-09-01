@@ -1,40 +1,62 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   X, Mail, Phone, Globe, Building2, MapPin,
-  BookOpen, ExternalLink, Quote,
+  ExternalLink, Quote, Terminal,
 } from 'lucide-react';
 import { fetchUserPosts } from '../services/userApi';
-import { getInitials, stringToHue, ensureProtocol } from '../utils/helpers';
+import { getInitials, ensureProtocol } from '../utils/helpers';
+
+const backdropVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.2 } },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
+};
+
+const modalVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 16 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: 'spring', damping: 26, stiffness: 360 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.96,
+    y: 10,
+    transition: { duration: 0.15 },
+  },
+};
 
 /* ── Post skeleton ─────────────────────────────────────────────── */
 const PostSkeleton = () => (
-  <div className="flex flex-col gap-2 p-4 bg-gray-950/60 rounded-xl border border-gray-800 animate-pulse">
-    <div className="h-4 bg-gray-800 rounded w-3/5" />
-    <div className="h-3 bg-gray-800/80 rounded w-full" />
-    <div className="h-3 bg-gray-800/80 rounded w-4/5" />
+  <div className="flex flex-col gap-2 p-3.5 bg-zinc-900/60 rounded-lg border border-zinc-850 animate-pulse">
+    <div className="h-3.5 bg-zinc-800 rounded w-3/5" />
+    <div className="h-3 bg-zinc-850 rounded w-full" />
+    <div className="h-3 bg-zinc-850 rounded w-4/5" />
   </div>
 );
 
 /* ── Info cell ─────────────────────────────────────────────────── */
 const InfoCell = ({ icon: Icon, label, children }) => (
-  <div className="flex flex-col gap-1 p-3 bg-gray-950/60 border border-gray-800 rounded-xl">
-    <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-      <Icon size={12} aria-hidden="true" />
+  <div className="flex flex-col gap-1 p-3 bg-zinc-900/60 border border-zinc-850 rounded-lg">
+    <span className="flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+      <Icon size={12} className="text-red-400" aria-hidden="true" />
       {label}
     </span>
-    <div className="text-xs font-medium text-gray-200 truncate">{children}</div>
+    <div className="font-mono text-xs font-medium text-zinc-200 truncate">{children}</div>
   </div>
 );
 
 /**
- * UserDetailModal — Accessible user profile and posts viewer.
+ * UserDetailModal — Animated Cyberpunk User Profile and Posts Viewer.
  */
 const UserDetailModal = ({ user, onClose }) => {
   const [posts, setPosts] = useState([]);
   const [postsLoading, setLoading] = useState(true);
   const [postsError, setError] = useState(null);
 
-  const hue = stringToHue(user.name);
   const initials = getInitials(user.name);
 
   // Escape key listener
@@ -57,7 +79,7 @@ const UserDetailModal = ({ user, onClose }) => {
         const data = await fetchUserPosts(user.id);
         if (isMounted) setPosts(data);
       } catch (err) {
-        if (isMounted) setError(err.message || 'Failed to load posts.');
+        if (isMounted) setError(err.message || 'Failed to load user posts.');
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -70,91 +92,106 @@ const UserDetailModal = ({ user, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
-      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="detail-modal-title"
     >
-      <div
-        className="bg-gray-900 border border-gray-800 relative rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+      {/* Backdrop */}
+      <motion.div
+        className="fixed inset-0 bg-black/80 backdrop-blur-md"
+        variants={backdropVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        onClick={onClose}
+      />
+
+      {/* Modal Dialog */}
+      <motion.div
+        className="relative z-10 bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/90 font-mono"
+        variants={modalVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-md flex items-center justify-between px-6 py-4 border-b border-gray-800 rounded-t-3xl">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-bold text-white shadow-md ring-2 ring-white/10"
-              style={{
-                background: `linear-gradient(135deg, hsl(${hue}, 70%, 45%), hsl(${hue + 40}, 70%, 35%))`,
-              }}
-            >
+        <div className="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md flex items-center justify-between px-6 py-4 border-b border-zinc-850 rounded-t-2xl">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-red-600/40 bg-red-950/40 font-mono text-xs font-bold text-red-400 shadow-inner">
               {initials}
             </div>
             <div>
-              <h2 id="detail-modal-title" className="text-base font-bold text-gray-100">{user.name}</h2>
-              <p className="text-xs text-gray-400 font-mono">@{user.username}</p>
+              <h2 id="detail-modal-title" className="font-sans text-sm sm:text-base font-bold uppercase tracking-wide text-zinc-100">
+                {user.name}
+              </h2>
+              <p className="text-xs text-zinc-500 font-mono">@{user.username}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-600/60 transition-colors cursor-pointer"
             aria-label="Close user details modal"
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 flex flex-col gap-6">
+        <div className="px-6 py-5 flex flex-col gap-5">
           {/* Info grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <InfoCell icon={Mail} label="Email">
-              <a href={`mailto:${user.email}`} className="text-indigo-300 hover:text-indigo-200 transition-colors">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <InfoCell icon={Mail} label="EMAIL">
+              <a href={`mailto:${user.email}`} className="text-zinc-300 hover:text-red-400 transition-colors">
                 {user.email}
               </a>
             </InfoCell>
-            <InfoCell icon={Phone} label="Phone">
+            <InfoCell icon={Phone} label="PHONE">
               {user.phone}
             </InfoCell>
-            <InfoCell icon={Globe} label="Website">
+            <InfoCell icon={Globe} label="NETWORK">
               <a
                 href={ensureProtocol(user.website)}
                 target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-cyan-300 hover:text-cyan-200 transition-colors"
+                rel="noreferrer"
+                className="flex items-center gap-1 text-red-400 hover:text-red-300 transition-colors"
               >
                 {user.website} <ExternalLink size={10} className="shrink-0" />
               </a>
             </InfoCell>
-            <InfoCell icon={Building2} label="Company">
+            <InfoCell icon={Building2} label="AFFILIATION">
               {user.company?.name || 'N/A'}
             </InfoCell>
-            <InfoCell icon={MapPin} label="City">
+            <InfoCell icon={MapPin} label="REGION">
               {user.address?.city || 'N/A'}
             </InfoCell>
-            <InfoCell icon={Quote} label="Catchphrase">
-              <span className="italic text-gray-400 text-[11px]">
-                "{user.company?.catchPhrase || 'No catchphrase'}"
+            <InfoCell icon={Quote} label="TAGLINE">
+              <span className="italic text-zinc-400 text-[11px]">
+                "{user.company?.catchPhrase || 'None'}"
               </span>
             </InfoCell>
           </div>
 
-          {/* Posts section */}
-          <div className="flex flex-col gap-4 pt-2 border-t border-gray-800">
-            <div className="flex items-center gap-2">
-              <BookOpen size={16} className="text-indigo-400" />
-              <h3 className="text-sm font-bold text-gray-200">Recent User Posts</h3>
+          {/* Posts Feed section */}
+          <div className="flex flex-col gap-3 pt-3 border-t border-zinc-900">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Terminal size={14} className="text-red-500" />
+                <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-300">
+                  // LOGGED_DISPATCHES
+                </h3>
+              </div>
               {!postsLoading && !postsError && (
-                <span className="ml-1 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  {posts.length}
+                <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-red-950/60 text-red-400 border border-red-800/60">
+                  COUNT: {posts.length}
                 </span>
               )}
             </div>
 
             {/* Skeleton state */}
             {postsLoading && (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2.5">
                 {[1, 2, 3].map((i) => (
                   <PostSkeleton key={i} />
                 ))}
@@ -163,35 +200,37 @@ const UserDetailModal = ({ user, onClose }) => {
 
             {/* Error state */}
             {postsError && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-300 text-xs">
-                ⚠️ {postsError}
+              <div className="p-3 rounded-lg bg-red-950/40 border border-red-800 text-red-400 font-mono text-xs">
+                [!] ERROR_FETCHING_POSTS: {postsError}
               </div>
             )}
 
             {/* Empty state */}
             {!postsLoading && !postsError && posts.length === 0 && (
-              <p className="text-xs text-gray-500 italic py-2">This user has no posts yet.</p>
+              <p className="font-mono text-xs text-zinc-600 italic py-2">
+                [SYSTEM: NO_TRANSMISSIONS_RECORDED]
+              </p>
             )}
 
             {/* Posts list */}
             {!postsLoading && !postsError && posts.length > 0 && (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2.5 max-h-72 overflow-y-auto pr-1">
                 {posts.map((post) => (
                   <article
                     key={post.id}
-                    className="p-4 bg-gray-950/60 border border-gray-800 hover:border-gray-700 rounded-xl transition-all"
+                    className="p-3.5 bg-zinc-900/60 border border-zinc-850 hover:border-red-900/60 rounded-lg transition-all"
                   >
-                    <h4 className="text-xs font-semibold text-gray-200 capitalize mb-1.5 leading-snug">
+                    <h4 className="font-sans text-xs font-bold text-zinc-200 capitalize mb-1 leading-snug">
                       {post.title}
                     </h4>
-                    <p className="text-[11px] text-gray-400 leading-relaxed">{post.body}</p>
+                    <p className="font-mono text-[11px] text-zinc-400 leading-relaxed">{post.body}</p>
                   </article>
                 ))}
               </div>
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

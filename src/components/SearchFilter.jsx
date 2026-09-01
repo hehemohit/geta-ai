@@ -2,7 +2,7 @@ import React, { memo, useCallback } from 'react';
 import { Search, Building2, ArrowUpDown, X } from 'lucide-react';
 
 /**
- * SearchFilter — Enhanced search, filter, and sorting controls.
+ * SearchFilter — Cyberpunk Red High-Contrast Search and Filter Bar.
  */
 const SearchFilter = memo(({
   searchQuery,
@@ -24,14 +24,14 @@ const SearchFilter = memo(({
   }, [onSearchChange, onCompanyChange, onSortChange]);
 
   return (
-    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 mb-8 bg-gray-900/60 p-4 sm:p-5 rounded-2xl border border-gray-800 shadow-sm backdrop-blur-sm">
+    <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-4 mb-6 p-3 sm:p-4 rounded-xl border border-zinc-850 bg-zinc-950/60 backdrop-blur-md">
       {/* Controls Container */}
-      <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5 flex-1">
-        {/* Search Input */}
-        <div className="relative flex-1 min-w-[220px]">
+      <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 flex-1">
+        {/* Search Input (#SEARCH_FIELD) */}
+        <div className="relative flex-1 min-w-[240px]">
           <Search
-            size={18}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            size={16}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
             aria-hidden="true"
           />
           <input
@@ -39,26 +39,26 @@ const SearchFilter = memo(({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search name, email, username..."
-            aria-label="Search users by name, email, or username"
-            className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl bg-gray-950/80 border border-gray-700/70 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-inner"
+            placeholder="#SEARCH_FIELD"
+            aria-label="Search users by name, email, or handle"
+            className="w-full pl-9 pr-9 py-2 font-mono text-xs sm:text-sm rounded-lg bg-zinc-900/90 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600/50 transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 transition-colors"
-              aria-label="Clear search input"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-zinc-400 hover:text-red-400 transition-colors cursor-pointer"
+              aria-label="Clear search query"
             >
-              <X size={15} />
+              <X size={14} />
             </button>
           )}
         </div>
 
         {/* Company Dropdown Filter */}
-        <div className="relative w-full sm:w-56 shrink-0">
+        <div className="relative w-full sm:w-52 shrink-0">
           <Building2
-            size={18}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            size={15}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
             aria-hidden="true"
           />
           <select
@@ -66,25 +66,25 @@ const SearchFilter = memo(({
             value={companyFilter}
             onChange={(e) => onCompanyChange(e.target.value)}
             aria-label="Filter users by company"
-            className="w-full pl-10 pr-8 py-2.5 text-sm appearance-none rounded-xl bg-gray-950/80 border border-gray-700/70 text-gray-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-inner"
+            className="w-full pl-8 pr-7 py-2 font-mono text-xs appearance-none rounded-lg bg-zinc-900/90 border border-zinc-800 text-zinc-200 cursor-pointer focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600/50 transition-all"
           >
-            <option value="" className="bg-gray-900 text-gray-100">All Companies</option>
+            <option value="" className="bg-zinc-950 text-zinc-200">All Companies</option>
             {companies.map((c) => (
-              <option key={c} value={c} className="bg-gray-900 text-gray-100">
+              <option key={c} value={c} className="bg-zinc-950 text-zinc-200">
                 {c}
               </option>
             ))}
           </select>
-          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs" aria-hidden="true">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 text-[10px]" aria-hidden="true">
             ▼
           </div>
         </div>
 
         {/* Sort By Dropdown */}
-        <div className="relative w-full sm:w-52 shrink-0">
+        <div className="relative w-full sm:w-48 shrink-0">
           <ArrowUpDown
-            size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            size={14}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
             aria-hidden="true"
           />
           <select
@@ -92,43 +92,42 @@ const SearchFilter = memo(({
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value)}
             aria-label="Sort users"
-            className="w-full pl-10 pr-8 py-2.5 text-sm appearance-none rounded-xl bg-gray-950/80 border border-gray-700/70 text-gray-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-inner"
+            className="w-full pl-8 pr-7 py-2 font-mono text-xs appearance-none rounded-lg bg-zinc-900/90 border border-zinc-800 text-zinc-200 cursor-pointer focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600/50 transition-all"
           >
-            <option value="name-asc" className="bg-gray-900 text-gray-100">Name (A → Z)</option>
-            <option value="name-desc" className="bg-gray-900 text-gray-100">Name (Z → A)</option>
-            <option value="company-asc" className="bg-gray-900 text-gray-100">Company (A → Z)</option>
-            <option value="company-desc" className="bg-gray-900 text-gray-100">Company (Z → A)</option>
-            <option value="id-asc" className="bg-gray-900 text-gray-100">User ID (Oldest)</option>
-            <option value="id-desc" className="bg-gray-900 text-gray-100">User ID (Newest)</option>
+            <option value="name-asc" className="bg-zinc-950 text-zinc-200">Sort: Name (A-Z)</option>
+            <option value="name-desc" className="bg-zinc-950 text-zinc-200">Sort: Name (Z-A)</option>
+            <option value="company-asc" className="bg-zinc-950 text-zinc-200">Sort: Company (A-Z)</option>
+            <option value="company-desc" className="bg-zinc-950 text-zinc-200">Sort: Company (Z-A)</option>
+            <option value="id-asc" className="bg-zinc-950 text-zinc-200">Sort: ID (Oldest)</option>
+            <option value="id-desc" className="bg-zinc-950 text-zinc-200">Sort: ID (Newest)</option>
           </select>
-          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs" aria-hidden="true">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500 text-[10px]" aria-hidden="true">
             ▼
           </div>
         </div>
 
-        {/* Reset Filters Button */}
+        {/* Reset Button */}
         {isFiltered && (
           <button
             onClick={handleReset}
             aria-label="Reset all search, filter, and sort options"
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 text-sm font-medium text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl hover:bg-rose-500/20 transition-all shrink-0 cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 font-mono text-xs font-semibold text-red-400 bg-red-950/40 border border-red-800/60 rounded-lg hover:bg-red-900/40 hover:border-red-600 transition-all shrink-0 cursor-pointer"
           >
-            <X size={15} />
-            <span>Reset</span>
+            <X size={13} />
+            <span>[RESET]</span>
           </button>
         )}
       </div>
 
-      {/* Results Counter */}
-      <div className="text-xs sm:text-sm text-gray-400 shrink-0 self-end lg:self-center">
+      {/* Results Status Count */}
+      <div className="font-mono text-xs text-zinc-500 shrink-0 self-end lg:self-center">
         {isFiltered ? (
           <span>
-            Showing <strong className="text-cyan-400 font-semibold">{filteredCount}</strong> of{' '}
-            <strong className="text-gray-200 font-semibold">{totalCount}</strong> users
+            MATCH: <strong className="text-red-400 font-bold">{filteredCount}</strong> / {totalCount}
           </span>
         ) : (
           <span>
-            Total: <strong className="text-gray-200 font-semibold">{totalCount}</strong> users
+            TOTAL: <strong className="text-zinc-300 font-bold">{totalCount}</strong>
           </span>
         )}
       </div>

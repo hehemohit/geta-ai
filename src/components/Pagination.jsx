@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
- * Pagination — Clean client-side pagination component with accessibility support.
+ * Pagination — Cyberpunk Red Style Client-Side Pagination.
  */
 const Pagination = memo(({
   currentPage,
@@ -16,7 +16,6 @@ const Pagination = memo(({
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
-  // Generate page numbers
   const pages = [];
   for (let i = 1; i <= totalPages; i++) {
     pages.push(i);
@@ -24,58 +23,60 @@ const Pagination = memo(({
 
   return (
     <nav
-      className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-gray-800/80"
+      className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 mt-4 border-t border-zinc-900 font-mono"
       aria-label="Pagination Navigation"
     >
-      {/* Items Range Display */}
-      <div className="text-xs sm:text-sm text-gray-400">
-        Showing <span className="font-semibold text-gray-200">{startItem}</span> to{' '}
-        <span className="font-semibold text-gray-200">{endItem}</span> of{' '}
-        <span className="font-semibold text-gray-200">{totalItems}</span> users
+      {/* Range Status */}
+      <div className="text-xs text-zinc-500">
+        Showing <span className="text-zinc-300 font-medium">{startItem}</span> to{' '}
+        <span className="text-zinc-300 font-medium">{endItem}</span> of{' '}
+        <span className="text-red-400 font-semibold">{totalItems}</span> users
       </div>
 
-      {/* Page Navigation Buttons */}
-      <div className="flex items-center gap-1.5">
-        {/* Previous Button */}
+      {/* Navigation Buttons */}
+      <div className="flex items-center gap-2">
+        {/* Prev */}
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           aria-label="Go to previous page"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-300 bg-gray-900 border border-gray-800 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 bg-zinc-950 border border-zinc-800 hover:border-red-600/60 hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
         >
-          <ChevronLeft size={14} />
-          <span className="hidden sm:inline">Prev</span>
+          <ChevronLeft size={13} />
+          <span>Prev</span>
         </button>
 
         {/* Numbered Page Buttons */}
-        {pages.map((page) => {
-          const isActive = page === currentPage;
-          return (
-            <button
-              key={page}
-              onClick={() => onPageChange(page)}
-              aria-current={isActive ? 'page' : undefined}
-              aria-label={`Go to page ${page}`}
-              className={`min-w-[32px] h-8 px-2 rounded-xl text-xs font-semibold transition-all ${
-                isActive
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 font-bold'
-                  : 'text-gray-400 bg-gray-900 border border-gray-800 hover:bg-gray-800 hover:text-gray-200'
-              }`}
-            >
-              {page}
-            </button>
-          );
-        })}
+        <div className="flex items-center gap-1.5">
+          {pages.map((page) => {
+            const isActive = page === currentPage;
+            return (
+              <button
+                key={page}
+                onClick={() => onPageChange(page)}
+                aria-current={isActive ? 'page' : undefined}
+                aria-label={`Go to page ${page}`}
+                className={`min-w-[30px] h-7.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/40 border border-red-500 scale-105'
+                    : 'text-zinc-400 bg-zinc-950 border border-zinc-800 hover:border-zinc-700 hover:text-zinc-200'
+                }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+        </div>
 
-        {/* Next Button */}
+        {/* Next */}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           aria-label="Go to next page"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-medium text-gray-300 bg-gray-900 border border-gray-800 hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 bg-zinc-950 border border-zinc-800 hover:border-red-600/60 hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
         >
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight size={14} />
+          <span>Next</span>
+          <ChevronRight size={13} />
         </button>
       </div>
     </nav>
