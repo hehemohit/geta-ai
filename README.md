@@ -12,7 +12,7 @@ A high-performance, dark-themed, cyberpunk-inspired **User Management Dashboard*
 
 ## 🔗 Live Deployment & Repository Links
 
-- **Live Deployment URL:** [https://geta-ai-user-management.vercel.app](https://hehemohit.vercel.app) *(or your Vercel deployment)*
+- **Live Deployment URL:** [https://geta-ai.vercel.app](https://geta-ai.vercel.app)
 - **GitHub Repository:** [https://github.com/hehemohit/geta-ai](https://github.com/hehemohit/geta-ai)
 - **Embedded Portfolio:** [https://hehemohit.vercel.app](https://hehemohit.vercel.app)
 
