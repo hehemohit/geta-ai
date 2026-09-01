@@ -4,7 +4,7 @@ import { Mail, Phone, Building2, Globe, ExternalLink } from 'lucide-react';
 import { getInitials, ensureProtocol } from '../utils/helpers';
 
 /**
- * UserCard — Animated Cyberpunk Red Accent Card with layoutId.
+ * UserCard — Animated Cyberpunk Red Accent Card with clickable card surface.
  */
 const UserCard = memo(({ user, onViewPosts, onEdit, onDelete }) => {
   const initials = getInitials(user.name);
@@ -12,7 +12,8 @@ const UserCard = memo(({ user, onViewPosts, onEdit, onDelete }) => {
   return (
     <motion.article
       layoutId={`user-card-${user.id}`}
-      className="group relative flex flex-col justify-between rounded-xl border border-zinc-850 bg-zinc-950/70 p-4 sm:p-5 backdrop-blur-md transition-colors duration-200 hover:border-red-600/70 hover:shadow-xl hover:shadow-red-950/30 h-full"
+      onClick={() => onViewPosts(user)}
+      className="group relative flex flex-col justify-between rounded-xl border border-zinc-850 bg-zinc-950/70 p-4 sm:p-5 backdrop-blur-md transition-all duration-200 hover:border-red-600/70 hover:shadow-xl hover:shadow-red-950/30 h-full cursor-pointer select-none"
     >
       {/* Top subtle corner accent */}
       <div className="absolute top-0 right-0 w-8 h-8 pointer-events-none overflow-hidden rounded-tr-xl">
@@ -46,6 +47,7 @@ const UserCard = memo(({ user, onViewPosts, onEdit, onDelete }) => {
             <Mail className="h-3.5 w-3.5 text-red-500/70 shrink-0" aria-hidden="true" />
             <a
               href={`mailto:${user.email}`}
+              onClick={(e) => e.stopPropagation()}
               className="truncate text-zinc-300 hover:text-red-400 transition-colors"
             >
               {user.email}
@@ -70,6 +72,7 @@ const UserCard = memo(({ user, onViewPosts, onEdit, onDelete }) => {
               href={ensureProtocol(user.website)}
               target="_blank"
               rel="noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="flex items-center gap-1 truncate text-red-400/90 hover:text-red-300 hover:underline transition-colors"
             >
               <span className="truncate">{user.website}</span>
@@ -82,21 +85,30 @@ const UserCard = memo(({ user, onViewPosts, onEdit, onDelete }) => {
       {/* Bottom: Cyberpunk Bracketed Action Buttons */}
       <div className="mt-4 flex items-center justify-end gap-2 border-t border-zinc-900 pt-3">
         <button
-          onClick={() => onViewPosts(user)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewPosts(user);
+          }}
           aria-label={`View posts by ${user.name}`}
           className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-2.5 py-1.5 font-mono text-[11px] font-medium text-zinc-300 transition-all hover:border-red-500/60 hover:bg-red-950/30 hover:text-red-400 active:scale-95 cursor-pointer"
         >
           [VIEW_POSTS]
         </button>
         <button
-          onClick={() => onEdit(user)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(user);
+          }}
           aria-label={`Edit ${user.name}`}
           className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-2.5 py-1.5 font-mono text-[11px] font-medium text-zinc-300 transition-all hover:border-red-500/60 hover:bg-red-950/30 hover:text-red-400 active:scale-95 cursor-pointer"
         >
           [EDIT]
         </button>
         <button
-          onClick={() => onDelete(user)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(user);
+          }}
           aria-label={`Delete ${user.name}`}
           className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-2.5 py-1.5 font-mono text-[11px] font-medium text-rose-400/90 transition-all hover:border-red-600 hover:bg-red-900/50 hover:text-red-300 active:scale-95 cursor-pointer"
         >

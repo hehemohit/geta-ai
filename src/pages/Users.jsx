@@ -44,7 +44,7 @@ const ErrorBanner = ({ message, onRetry, onDismiss }) => (
 );
 
 /**
- * Users — Pinned Sidebar + Centered 1200px Content Container with Framer Motion transitions.
+ * Users — Vertically and Horizontally Centered Cyberpunk Admin Dashboard.
  */
 const Users = () => {
   const {
@@ -143,7 +143,7 @@ const Users = () => {
   }, [retryLoad]);
 
   return (
-    <div className="flex min-h-screen w-full bg-[#070709] text-zinc-100 antialiased">
+    <div className="flex min-h-screen w-full bg-[#070709] text-zinc-100 antialiased overflow-x-hidden">
       
       {/* ── Left Sidebar Pinned to Screen Edge ─────────────────────── */}
       <aside className="hidden xl:flex w-20 shrink-0 flex-col justify-between items-center py-8 px-4 border-r border-zinc-900 bg-zinc-950/80 sticky top-0 h-screen">
@@ -175,10 +175,10 @@ const Users = () => {
         </span>
       </aside>
 
-      {/* ── Main Viewport with Centered 1200px Content Container ──── */}
-      <main className="flex-1 w-full min-w-0 px-4 sm:px-8 py-8 flex flex-col items-center overflow-y-auto">
-        {/* Centered Content Container */}
-        <div className="w-full max-w-[1200px] flex flex-col gap-6">
+      {/* ── Main Viewport Centered Evenly Vertically & Horizontally ──── */}
+      <main className="flex-1 w-full min-w-0 min-h-screen px-4 sm:px-8 py-8 sm:py-12 flex flex-col justify-center items-center overflow-y-auto">
+        {/* Centered Content Container with Equal Top & Bottom Auto Spacing */}
+        <div className="w-full max-w-[1200px] flex flex-col gap-6 my-auto">
           
           {/* 1. Header Section */}
           <header className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 pb-6 border-b border-zinc-900">
